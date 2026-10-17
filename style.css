@@ -1,18 +1,18 @@
-/* صورة المنتج في الكارت */
+/* Product image inside the card */
 .product-img {
   height: 220px;
   object-fit: contain;
   padding: 15px;
 }
 
-/* عنوان المنتج */
+/* Product title */
 .product-title {
   height: 48px;
   overflow: hidden;
   font-size: 1rem;
 }
 
-/* تأثير لما الماوس يعدي على الكارت */
+/* Hover effect on cards */
 .card {
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -22,12 +22,12 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* صورة الـ Modal */
+/* Modal image */
 .modal-img {
   max-height: 300px;
 }
 
-/* ===== السلة ===== */
+/* ===== Cart ===== */
 .cart-item {
   display: flex;
   align-items: center;
