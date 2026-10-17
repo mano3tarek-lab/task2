@@ -1,20 +1,20 @@
 $(document).ready(function () {
 
-  // لينك الـ API
+  // API link
   var apiUrl = "https://fakestoreapi.com/products";
 
-  var allProducts = [];   // كل المنتجات اللي جاية من الـ API
-  var cart = [];          // المنتجات اللي في السلة
-  var currentProductId = null;   // المنتج المفتوح في الـ Modal
+  var allProducts = [];          // all products coming from the API
+  var cart = [];                 // products in the cart
+  var currentProductId = null;   // product currently open in the modal
 
-  // رجّع السلة المحفوظة (لو موجودة) لما الصفحة تفتح
+  // Load the saved cart (if any) when the page opens
   var savedCart = localStorage.getItem("cart");
   if (savedCart) {
     cart = JSON.parse(savedCart);
   }
   showCart();
 
-  // 1) جلب المنتجات من الـ API باستخدام fetch
+  // 1) Get products from the API using fetch
   fetch(apiUrl)
     .then(function (response) {
       return response.json();
@@ -30,7 +30,7 @@ $(document).ready(function () {
       $("#errorMsg").removeClass("d-none");
     });
 
-  // 2) ملء قائمة الأقسام
+  // 2) Fill the categories dropdown
   function fillCategories() {
     var categories = [];
     for (var i = 0; i < allProducts.length; i++) {
@@ -45,12 +45,12 @@ $(document).ready(function () {
     }
   }
 
-  // 3) عرض المنتجات كـ Cards
+  // 3) Show products as cards
   function showProducts(products) {
     var html = "";
 
     if (products.length === 0) {
-      html = '<p class="text-center text-muted">مفيش منتجات مطابقة.</p>';
+      html = '<p class="text-center text-muted">No matching products.</p>';
     }
 
     for (var i = 0; i < products.length; i++) {
@@ -64,8 +64,8 @@ $(document).ready(function () {
               '<p class="text-muted small mb-1">' + p.category + '</p>' +
               '<p class="fw-bold text-success mb-3">$' + p.price + '</p>' +
               '<div class="mt-auto d-flex gap-2">' +
-                '<button class="btn btn-outline-primary btn-sm flex-fill details-btn" data-id="' + p.id + '">التفاصيل</button>' +
-                '<button class="btn btn-primary btn-sm flex-fill add-btn" data-id="' + p.id + '">أضف للسلة</button>' +
+                '<button class="btn btn-outline-primary btn-sm flex-fill details-btn" data-id="' + p.id + '">Details</button>' +
+                '<button class="btn btn-primary btn-sm flex-fill add-btn" data-id="' + p.id + '">Add to cart</button>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -75,7 +75,7 @@ $(document).ready(function () {
     $("#productsRow").html(html);
   }
 
-  // 4) البحث + الفلترة
+  // 4) Search + filter
   function filterProducts() {
     var text = $("#searchInput").val().toLowerCase();
     var category = $("#categorySelect").val();
@@ -96,11 +96,11 @@ $(document).ready(function () {
   $("#searchInput").on("keyup", filterProducts);
   $("#categorySelect").on("change", filterProducts);
 
-  // ================= السلة =================
+  // ================= Cart =================
 
-  // إضافة منتج للسلة
+  // Add a product to the cart
   function addToCart(id) {
-    // لو المنتج موجود في السلة زوّد الكمية
+    // If the product is already in the cart, increase its quantity
     for (var i = 0; i < cart.length; i++) {
       if (cart[i].id == id) {
         cart[i].qty++;
@@ -110,7 +110,7 @@ $(document).ready(function () {
       }
     }
 
-    // لو مش موجود دور عليه وضيفه
+    // Otherwise find it in the products list and add it
     for (var j = 0; j < allProducts.length; j++) {
       if (allProducts[j].id == id) {
         cart.push({
@@ -127,14 +127,14 @@ $(document).ready(function () {
     showCart();
   }
 
-  // عرض السلة
+  // Show the cart
   function showCart() {
     var html = "";
     var total = 0;
     var count = 0;
 
     if (cart.length === 0) {
-      html = '<p class="text-center text-muted mt-4">السلة فاضية</p>';
+      html = '<p class="text-center text-muted mt-4">Your cart is empty</p>';
     }
 
     for (var i = 0; i < cart.length; i++) {
@@ -163,17 +163,17 @@ $(document).ready(function () {
     $("#cartCount").text(count);
   }
 
-  // حفظ السلة في المتصفح
+  // Save the cart in the browser
   function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 
-  // زرار أضف للسلة (من الكارت)
+  // "Add to cart" button (on the card)
   $("#productsRow").on("click", ".add-btn", function () {
     addToCart($(this).data("id"));
   });
 
-  // زرار +
+  // "+" button
   $("#cartItems").on("click", ".plus-btn", function () {
     var id = $(this).data("id");
     for (var i = 0; i < cart.length; i++) {
@@ -185,14 +185,14 @@ $(document).ready(function () {
     showCart();
   });
 
-  // زرار -
+  // "-" button
   $("#cartItems").on("click", ".minus-btn", function () {
     var id = $(this).data("id");
     for (var i = 0; i < cart.length; i++) {
       if (cart[i].id == id) {
         cart[i].qty--;
         if (cart[i].qty === 0) {
-          cart.splice(i, 1);   // لو الكمية بقت صفر شيل المنتج
+          cart.splice(i, 1);   // remove the product when quantity reaches zero
         }
         break;
       }
@@ -201,7 +201,7 @@ $(document).ready(function () {
     showCart();
   });
 
-  // زرار الحذف
+  // Remove button
   $("#cartItems").on("click", ".remove-btn", function () {
     var id = $(this).data("id");
     for (var i = 0; i < cart.length; i++) {
@@ -214,28 +214,28 @@ $(document).ready(function () {
     showCart();
   });
 
-  // تفريغ السلة
+  // Clear the cart
   $("#clearCartBtn").on("click", function () {
     cart = [];
     saveCart();
     showCart();
   });
 
-  // إتمام الشراء
+  // Checkout
   $("#checkoutBtn").on("click", function () {
     if (cart.length === 0) {
-      alert("السلة فاضية!");
+      alert("Your cart is empty!");
       return;
     }
-    alert("تم إتمام الشراء بنجاح ✅ شكراً ليك!");
+    alert("Order placed successfully ✅ Thank you!");
     cart = [];
     saveCart();
     showCart();
   });
 
-  // ================= الـ Modal =================
+  // ================= Modal =================
 
-  // زرار التفاصيل -> يفتح Modal
+  // "Details" button -> open the modal
   $("#productsRow").on("click", ".details-btn", function () {
     var id = $(this).data("id");
 
@@ -248,7 +248,7 @@ $(document).ready(function () {
         $("#modalCategory").text(p.category);
         $("#modalDesc").text(p.description);
         $("#modalPrice").text("$" + p.price);
-        $("#modalRating").text("⭐ " + p.rating.rate + " (" + p.rating.count + " تقييم)");
+        $("#modalRating").text("⭐ " + p.rating.rate + " (" + p.rating.count + " reviews)");
         break;
       }
     }
@@ -256,7 +256,7 @@ $(document).ready(function () {
     new bootstrap.Modal($("#productModal")[0]).show();
   });
 
-  // زرار أضف للسلة (من الـ Modal)
+  // "Add to cart" button (inside the modal)
   $("#modalAddBtn").on("click", function () {
     addToCart(currentProductId);
   });
